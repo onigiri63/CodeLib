@@ -1,0 +1,3 @@
+﻿TODO:
+
+change protocol to use fixed length fields instead of delimiter characters - COMPLETE
