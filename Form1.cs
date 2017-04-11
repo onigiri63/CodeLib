@@ -31,9 +31,11 @@ namespace CodeLib
     public partial class Form1 : Form
     {
         private const int port = 27410;
-        private const String IPAddress = "jshikany.asuscomm.com"; //Change this to your server's ip address
-                                                    //or DNS name
-                                                    //TODO:  add a setup menu to control this.
+
+        //Change this to your server's ip address or DNS name
+        //TODO:  add a setup menu to control this.
+        private const String IPAddress = "jshikany.asuscomm.com"; 
+                                                    
 
         private int BUFFER_SIZE = (1 << 20);
 
@@ -98,11 +100,10 @@ namespace CodeLib
 
                             byte[] outBytes = encode.GetBytes(outgoing);
                             stream.Write(outBytes,0,outBytes.Length);
-
+                            Thread.Sleep(200);
                             bytesFrom = new byte[BUFFER_SIZE];
                             stream.Read(bytesFrom, 0, BUFFER_SIZE);
 
-                            items = new List<item>();
                             String RXVal = string.Empty;
                             try
                             {
@@ -157,24 +158,30 @@ namespace CodeLib
         /// <param name="value">A properly-formatted string from the server</param>
         private void processString(string value)
         {
-            if(value[0] == '-' || value[0] == '\0')
-                return;
-            int numEntries = Convert.ToInt32(value.Substring(0, 4).Replace(" ",""));
-
-            int stringStart = 4;
-            for (int i = 0; i < numEntries; i++)
+            items = new List<item>();
+            try
             {
-                int length = Convert.ToInt32(value.Substring(stringStart, 8).Replace(" ",""));
-                String[] message = value.Substring(stringStart + 8, length).Split(new Char[] {'~'},4);
-                stringStart = stringStart + 8 + length;
+                if(value[0] == '-' || value[0] == '\0')
+                    return;
+                int numEntries = Convert.ToInt32(value.Substring(0, 4).Replace(" ",""));
 
-                item itm = new item();
-                itm.language = message[0];
-                itm.title = message[1];
-                itm.keywords = message[2];
-                itm.code = message[3].Replace("\n","\r\n");
-                items.Add(itm);
+                int stringStart = 4;
+           
+                for (int i = 0; i < numEntries; i++)
+                {
+                    int length = Convert.ToInt32(value.Substring(stringStart, 8).Replace(" ", ""));
+                    String[] message = value.Substring(stringStart + 8, length).Split(new Char[] { '~' }, 4);
+                    stringStart = stringStart + 8 + length;
+
+                    item itm = new item();
+                    itm.language = message[0];
+                    itm.title = message[1];
+                    itm.keywords = message[2];
+                    itm.code = message[3].Replace("\n", "\r\n");
+                    items.Add(itm);
+                }
             }
+            catch (Exception e) { }
         }
 
         /// <summary>
